@@ -1,13 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const methodOverride = require('method-override'); 
 const taskRoutes = require('./routes/task.routes'); 
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+app.set('view engine', 'ejs');
 
-app.use('/tasks', taskRoutes);
+// Мидлвары
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); 
+app.use(methodOverride('_method')); 
+
+app.use('/', taskRoutes);
 
 const MONGO_URI = 'mongodb://localhost:27017/todo_db';
 

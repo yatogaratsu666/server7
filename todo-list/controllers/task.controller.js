@@ -2,10 +2,10 @@ const Todo = require('../todo.model');
 
 exports.getAllTasks = async (req, res) => {
     try {
-        const tasks = await Todo.find();
-        res.status(200).json(tasks);
+        const tasks = await Todo.find().sort({ createdAt: -1 });
+        res.status(200).render('index', { todos: tasks });
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при получении списка задач', error: error.message });
+        res.status(500).send('Ошибка при получении списка задач: ' + error.message);
     }
 };
 
@@ -13,31 +13,31 @@ exports.createTask = async (req, res) => {
     try {
         const { title } = req.body;
         const newTask = new Todo({ title });
-        const savedTask = await newTask.save();
-        res.status(201).json(savedTask);
+        await newTask.save();
+        res.redirect('/');
     } catch (error) {
-        res.status(400).json({ message: 'Ошибка при создании задачи', error: error.message });
+        res.status(400).send('Ошибка при создании задачи: ' + error.message);
     }
 };
 
 exports.updateTask = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, completed } = req.body;
+        const { completed } = req.body;
 
         const updatedTask = await Todo.findByIdAndUpdate(
             id, 
-            { title, completed }, 
+            { completed: completed === 'true' }, 
             { new: true, runValidators: true }
         );
 
         if (!updatedTask) {
-            return res.status(404).json({ message: 'Задача с таким ID не найдена' });
+            return res.status(404).send('Задача с таким ID не найдена');
         }
 
-        res.status(200).json(updatedTask);
+        res.redirect('/');
     } catch (error) {
-        res.status(400).json({ message: 'Ошибка при обновлении задачи', error: error.message });
+        res.status(400).send('Ошибка при обновлении задачи: ' + error.message);
     }
 };
 
@@ -47,11 +47,11 @@ exports.deleteTask = async (req, res) => {
         const deletedTask = await Todo.findByIdAndDelete(id);
 
         if (!deletedTask) {
-            return res.status(404).json({ message: 'Задача с таким ID не найдена' });
+            return res.status(404).send('Задача с таким ID не найдена');
         }
 
-        res.status(200).json({ message: 'Задача успешно удалена', deletedTask });
+        res.redirect('/'); 
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при удалении задачи', error: error.message });
+        res.status(500).send('Ошибка при удалении задачи: ' + error.message);
     }
 };
