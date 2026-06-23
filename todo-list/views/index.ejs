@@ -18,6 +18,18 @@
             color: #2c3e50;
             margin-bottom: 30px;
         }
+        .error-block {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        .error-block ul {
+            margin: 0;
+            padding-left: 20px;
+        }
         form { 
             display: flex; 
             gap: 12px; 
@@ -99,6 +111,16 @@
 <body>
 
     <h1>Список задач</h1>
+
+    <% if (errors) { %>
+        <div class="error-block">
+            <ul>
+                <% errors.forEach(error => { %>
+                    <li><%= error.msg %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
 
     <form action="/todos" method="POST">
         <input type="text" name="title" placeholder="Новая задача..." required>
